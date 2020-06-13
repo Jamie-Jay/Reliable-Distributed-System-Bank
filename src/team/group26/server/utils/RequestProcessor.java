@@ -3,69 +3,56 @@ package team.group26.server.utils;
 import team.group26.server.Bank;
 
 public class RequestProcessor {
-    //different input stage
-    private static final int WAITING = 0;
-    private static final int SERVICE = 1;
-    private static final int WITHDRAW = 2;
-    private static final int DEPOSIT = 3;
-    private static final int CONTINUE= 4;
-    private String cID;
-    //one thread and one server.ProcessInput object for one client, initial the client ID with client input
-    public RequestProcessor(String cID){
-        this.cID = cID;
+    // Request Type
+    private static final String DEPOSIT = "DEP";
+    private static final String WITHDRAW = "WTD";
+    private static final String PING = "PING";
+    private static final String WELCOME = "Hello, please apply the request <cid> <cmd> <amount>";
+
+    private String cid;
+    // One thread and one server.ProcessInput object for one client, initial the client ID with client input
+    public RequestProcessor(String cid){
+        this.cid = cid;
     }
 
-    private int state = WAITING;
     final Bank bank=Bank.getInstance();
 
-    private String[] output = { "Please select the service you like by inputting the number: 1. Withdraw 2. Deposit ",
-            "Please enter the amount of money you want to withdraw:",
-            "Please enter the amount of money you want to deposit:" };
-
     public synchronized String processInput(String theInput) {
-        String theOutput = null;
-
-        if (state == WAITING) {
-            theOutput = output[0];
-            state = SERVICE;
-        } else if (state == SERVICE) {
-            if (theInput.equals("1")) {
-                theOutput = output[1];
-                state = WITHDRAW;
-            } else if(theInput.equals("2")){
-                theOutput = output[2];
-                state = DEPOSIT;
-            } else {
-                theOutput = "You're supposed to enter\"1\" or \"2\" " +
-                        "Try again. ";
-            }
-        } else if (state == WITHDRAW) {
-            int n = Integer.parseInt(theInput);
-            if (n > bank.getBalance()) {
-                theOutput =  "You don't have enough balance, the balance is " + bank.getBalance()+" want continue service? [y/n]";
-                state = CONTINUE;
-            }else if (n > 0 && n <= bank.getBalance()){
-                bank.withdrawMoney(cID,n);
-                theOutput =  "Successfully withdraw, the balance is " + bank.getBalance()+" want continue service? [y/n]";
-                state = CONTINUE;
-            } else {
-                theOutput = "You're supposed to input a integer number which not less than 1";
-                state = SERVICE;
-            }
-        } else if (state == DEPOSIT) {
-            int n = Integer.parseInt(theInput);
-            bank.depositMoney(cID,n);
-            theOutput =  "Successfully deposit, the balance is " + bank.getBalance() +" want continue service? [y/n]";
-            state = CONTINUE;
-        }else if (state == CONTINUE){
-            if (theInput.equals("y")){
-                theOutput = "1. Withdraw 2. Deposit";
-                state = SERVICE;
-            }else{
-                theOutput = "close";
-                state = WAITING;
-            }
+        if(theInput == null){
+            return WELCOME;
         }
-        return theOutput;
+        String[] request = theInput.split("\\s+");
+        String response = null;
+        if(request[0].equals(PING)) {
+            response = "Pong";
+            return response;
+        }
+        // Wrong Format
+        if(request.length != 3) {
+            response = "Undefined Request.";
+            return response;
+        }
+
+        if(request[1].equals(DEPOSIT)) {
+            try {
+                bank.depositMoney(cid, Integer.parseInt(request[2]));
+                response = "SUCCESS: Remain " + bank.getBalance() + " in account.";
+            } catch (NumberFormatException e) {
+                response = "Amount of money must be an integer.";
+            }
+        } else if(request[1].equals(WITHDRAW)) {
+            try {
+                if(bank.withdrawMoney(cid, Integer.parseInt(request[2]))) {
+                    response = "SUCCESS: Remain" + bank.getBalance() + "in account.";
+                } else {
+                    response = "FAIL: Balance is not enough. Your heart should be in work.";
+                }
+            } catch (NumberFormatException e) {
+                response = "Amount of money must be an integer.";
+            }
+        } else {
+            response = "Undefined Request.";
+        }
+        return response;
     }
 }

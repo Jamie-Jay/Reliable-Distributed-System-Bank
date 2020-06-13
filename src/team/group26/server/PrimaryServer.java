@@ -30,8 +30,7 @@ public class PrimaryServer {
             System.out.println("The server is running on port " + this.port);
             while(true){
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("A client is connected");
-                MainHandler mainHandler = new MainHandler(clientSocket);
+                MainHandler mainHandler = new MainHandler(clientSocket, sid);
                 mainHandler.start();
             }
         }catch (Exception e){
@@ -41,7 +40,7 @@ public class PrimaryServer {
 
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
-        (new PrimaryServer(port)).runService();
+        (new PrimaryServer(port, args[1])).runService();
     }
 }
 

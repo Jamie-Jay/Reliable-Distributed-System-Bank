@@ -1,47 +1,42 @@
 package team.group26.client;
 
+import team.group26.client.handler.RequestHandler;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Client {
+    private String hostName;
+    private int port;
+    private String cid;
+    private List<Socket> servers = new CopyOnWriteArrayList<>();
+
+    public Client(String hostName, int port, String cid) {
+        this.hostName = hostName;
+        this.port = port;
+        this.cid = cid;
+    }
+
+    public void runService() {
+        try {
+            Socket clientSocket = new Socket(hostName, port);
+            System.out.println("The client "+cid+" is running");
+            (new RequestHandler(clientSocket, cid)).run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
+        int port = Integer.parseInt(args[1]);
         //get the client ID from Command line
-        String cID = args[2];
-
-        try {
-            Socket clientSocket = new Socket(hostName, portNumber);
-            System.out.println("The client "+cID+" is running");
-
-            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(),true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-            //pass the client ID to server
-            out.println(cID);
-            String fromServer;
-            String userInput;
-
-            while ((fromServer = in.readLine()) != null) {
-                System.out.println("Server: " + fromServer);
-                if (fromServer.equals("exit"))
-                    break;
-
-                userInput = stdIn.readLine();
-                if (userInput != null) {
-                    System.out.println("client: " + userInput);
-                    out.println(userInput);
-                }
-            }
-            clientSocket.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
+        String cid = args[2];
+        (new Client(hostName, port, cid)).runService();
     }
 }
 
