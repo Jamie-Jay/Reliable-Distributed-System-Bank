@@ -1,4 +1,4 @@
-package server;
+package team.group26.server;
 
 public class Bank {
 
@@ -9,9 +9,13 @@ public class Bank {
     //make the constructor private
     private Bank(){ }
 
-    public static synchronized Bank getInstance() {
+    public static Bank getInstance() {
         if (bank == null) {
-            bank = new Bank();
+            synchronized (Bank.class) {
+                if (bank == null) {
+                    bank = new Bank();
+                }
+            }
         }
         return bank;
     }

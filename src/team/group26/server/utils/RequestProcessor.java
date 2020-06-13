@@ -1,69 +1,8 @@
-package server;
+package team.group26.server.utils;
 
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import team.group26.server.Bank;
 
-
-public class Server {
-
-    public static void main(String[] args) {
-
-        int portNumber = Integer.parseInt(args[0]);
-        try {
-
-            ServerSocket serverSocket = new ServerSocket( portNumber );
-            System.out.println("The server is running on port " + args[0]);
-
-            while(true){
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("A client is connected");
-
-                ServerThread st = new ServerThread(clientSocket);
-                st.start();
-            }
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-    }
-}
-
-class ServerThread extends Thread
-{
-    Socket clientSocket;
-    String inputLine,outputLine;
-    public ServerThread(Socket clientSocket){
-        this.clientSocket= clientSocket;
-    }
-
-    public void run() {
-        try(
-                PrintWriter out =
-                        new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(clientSocket.getInputStream()));
-        ){
-            //get the client ID
-            String cID = in.readLine();
-            ProcessInput pi = new ProcessInput(cID);
-            outputLine = pi.processInput(null);
-            out.println(outputLine);
-            while((inputLine = in.readLine()) != null) {
-                outputLine = pi.processInput(inputLine);
-                out.println(outputLine);
-                if (outputLine.equals("exit"))
-                    break;
-            }
-        }
-        catch(IOException e){
-            e.printStackTrace();
-        }
-    }
-}
-
-class ProcessInput {
+public class RequestProcessor {
     //different input stage
     private static final int WAITING = 0;
     private static final int SERVICE = 1;
@@ -72,7 +11,7 @@ class ProcessInput {
     private static final int CONTINUE= 4;
     private String cID;
     //one thread and one server.ProcessInput object for one client, initial the client ID with client input
-    public ProcessInput(String cID){
+    public RequestProcessor(String cID){
         this.cID = cID;
     }
 
@@ -84,7 +23,6 @@ class ProcessInput {
             "Please enter the amount of money you want to deposit:" };
 
     public synchronized String processInput(String theInput) {
-
         String theOutput = null;
 
         if (state == WAITING) {
