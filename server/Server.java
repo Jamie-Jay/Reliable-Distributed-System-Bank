@@ -1,3 +1,5 @@
+package server;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -69,7 +71,7 @@ class ProcessInput {
     private static final int DEPOSIT = 3;
     private static final int CONTINUE= 4;
     private String cID;
-    //one thread and one ProcessInput object for one client, initial the client ID with client input
+    //one thread and one server.ProcessInput object for one client, initial the client ID with client input
     public ProcessInput(String cID){
         this.cID = cID;
     }

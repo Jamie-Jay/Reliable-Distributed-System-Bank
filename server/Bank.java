@@ -1,3 +1,5 @@
+package server;
+
 public class Bank {
 
     private int balance=0;
