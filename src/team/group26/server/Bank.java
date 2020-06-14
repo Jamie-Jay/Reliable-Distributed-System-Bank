@@ -22,25 +22,22 @@ public class Bank {
 
     public synchronized void depositMoney(String cID,int money) {
         balance+=money;
-        System.out.println("The client "+cID +" deposits"+money);
     }
 
-    public synchronized void withdrawMoney(String cID, int money)
+    public synchronized boolean withdrawMoney(String cID, int money)
     {
         if(balance-money<0)
         {
-            System.out.println("Insufficient balance");
-            return;
+            return false;
         }else {
             balance-=money;
-            System.out.println("The client"+ cID +" withdraw"+money);
+            return true;
         }
 
     }
 
     public int getBalance()
     {
-        System.out.println("The balance is "+balance);
         return balance;
     }
 

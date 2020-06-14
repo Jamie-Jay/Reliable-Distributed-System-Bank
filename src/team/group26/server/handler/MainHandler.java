@@ -12,25 +12,29 @@ public class MainHandler extends Thread
 {
     Socket clientSocket;
     String inputLine,outputLine;
-    public MainHandler(Socket clientSocket){
-        this.clientSocket= clientSocket;
+    String sid;
+    public MainHandler(Socket clientSocket, String sid){
+        this.clientSocket = clientSocket;
+        this.sid = sid;
     }
 
     public void run() {
-        try(
-                PrintWriter out =
-                        new PrintWriter(clientSocket.getOutputStream(), true);
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(clientSocket.getInputStream()));
-        ){
+        try{
+            PrintWriter out =
+                    new PrintWriter(clientSocket.getOutputStream(), true);
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(clientSocket.getInputStream()));
             //get the client ID
-            String cID = in.readLine();
-            RequestProcessor pi = new RequestProcessor(cID);
+            String cid = in.readLine();
+            System.out.println("[client "+ cid +"] is connected.");
+            RequestProcessor pi = new RequestProcessor(cid);
             outputLine = pi.processInput(null);
             out.println(outputLine);
             while((inputLine = in.readLine()) != null) {
+                System.out.println("Reply from [Client " + cid + "] " + inputLine);
                 outputLine = pi.processInput(inputLine);
-                out.println(outputLine);
+                out.println("[Serve " + sid + "] " + outputLine);
+                System.out.println("Response to [Client " + cid + "] " + outputLine);
                 if (outputLine.equals("exit"))
                     break;
             }

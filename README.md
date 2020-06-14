@@ -7,7 +7,7 @@
 cd ~/src/server
 javac Server.java Bank.java
 cd .. // return to src diretory
-java server.Server 8080 // args[0] - portNumber
+java server.Server 8080 s1// args[0] - portNumber args[1] - Server ID
 ```
 
 ### Start client
