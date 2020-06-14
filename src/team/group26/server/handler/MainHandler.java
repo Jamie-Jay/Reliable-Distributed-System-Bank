@@ -26,21 +26,31 @@ public class MainHandler extends Thread
                     new InputStreamReader(clientSocket.getInputStream()));
             //get the client ID
             String cid = in.readLine();
-            System.out.println("[client "+ cid +"] is connected.");
+            if(!cid.equals("LFD")){
+                System.out.println("[client "+ cid +"] is connected.");
+            }
             RequestProcessor pi = new RequestProcessor(cid);
             outputLine = pi.processInput(null);
             out.println(outputLine);
             while((inputLine = in.readLine()) != null) {
-                System.out.println("Reply from [Client " + cid + "] " + inputLine);
                 outputLine = pi.processInput(inputLine);
-                out.println("[Serve " + sid + "] " + outputLine);
-                System.out.println("Response to [Client " + cid + "] " + outputLine);
+                out.println(outputLine);
+                if(!cid.equals("LFD")) {
+                    System.out.println("Reply from [Client " + cid + "] " + inputLine);
+                    System.out.println("Response to [Client " + cid + "] " + outputLine);
+                } else {
+                    System.out.println("[LFD] PING");
+                }
                 if (outputLine.equals("exit"))
                     break;
             }
         }
         catch(IOException e){
-            e.printStackTrace();
+            try {
+                clientSocket.close();
+            } catch (IOException ex) {
+
+            }
         }
     }
 }

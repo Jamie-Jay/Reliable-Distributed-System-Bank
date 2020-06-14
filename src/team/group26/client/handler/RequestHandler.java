@@ -27,7 +27,7 @@ public class RequestHandler extends Thread {
             String userInput;
 
             while ((fromServer = in.readLine()) != null) {
-                System.out.println("Server: " + fromServer);
+                System.out.println("[Server] " + fromServer);
                 if (fromServer.equals("exit"))
                     break;
 

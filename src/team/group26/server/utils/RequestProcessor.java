@@ -24,7 +24,7 @@ public class RequestProcessor {
         String[] request = theInput.split("\\s+");
         String response = null;
         if(request[0].equals(PING)) {
-            response = "Pong";
+            response = "PONG";
             return response;
         }
         // Wrong Format
