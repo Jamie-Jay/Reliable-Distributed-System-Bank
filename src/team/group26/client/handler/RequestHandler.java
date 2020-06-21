@@ -9,10 +9,12 @@ public class RequestHandler extends Thread {
     private Socket socket;
     private String inputLine, outputLine;
     private String cid;
+    private int baseRid;
 
-    public RequestHandler(Socket socket, String cid) {
+    public RequestHandler(Socket socket, String cid, int baseRid) {
         this.socket = socket;
         this.cid = cid;
+        this.baseRid = baseRid;
     }
 
     @Override
@@ -34,7 +36,8 @@ public class RequestHandler extends Thread {
                 userInput = stdIn.readLine();
                 if (userInput != null) {
                     System.out.println("client: " + userInput);
-                    out.println(userInput);
+                    out.println("" + cid + " " + baseRid + " " + userInput);
+                    baseRid += 1;
                 }
             }
             socket.close();

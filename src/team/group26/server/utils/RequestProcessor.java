@@ -7,7 +7,7 @@ public class RequestProcessor {
     private static final String DEPOSIT = "DEP";
     private static final String WITHDRAW = "WTD";
     private static final String PING = "PING";
-    private static final String WELCOME = "Hello, please apply the request <cid> <cmd> <amount>";
+    private static final String WELCOME = "Hello, please apply the request <cmd> <amount>";
 
     private String cid;
     // One thread and one server.ProcessInput object for one client, initial the client ID with client input
@@ -28,30 +28,31 @@ public class RequestProcessor {
             return response;
         }
         // Wrong Format
-        if(request.length != 3) {
-            response = "Undefined Request.";
+        if(request.length != 4) {
+            response = String.format("%s %s Undefined Request", cid, request[1]);
             return response;
         }
 
-        if(request[1].equals(DEPOSIT)) {
+        if(request[2].equals(DEPOSIT)) {
             try {
-                bank.depositMoney(cid, Integer.parseInt(request[2]));
-                response = "SUCCESS: Remain " + bank.getBalance() + " in account.";
+                bank.depositMoney(cid, Integer.parseInt(request[3]));
+                response = String.format("%s %s SUCCESS: Remain %d in account.", cid, request[1], bank.getBalance());
             } catch (NumberFormatException e) {
-                response = "Amount of money must be an integer.";
+                response = String.format("%s %s Undefined Request.", cid, request[1]);
             }
-        } else if(request[1].equals(WITHDRAW)) {
+        } else if(request[2].equals(WITHDRAW)) {
             try {
-                if(bank.withdrawMoney(cid, Integer.parseInt(request[2]))) {
-                    response = "SUCCESS: Remain" + bank.getBalance() + "in account.";
+                if(bank.withdrawMoney(cid, Integer.parseInt(request[3]))) {
+                    response = String.format("%s %s SUCCESS: Remain %d in account.", cid, request[1], bank.getBalance());
                 } else {
-                    response = "FAIL: Balance is not enough. Your heart should be in work.";
+                    response = String.format("%s %s FAIL: Balance %d is not enough. Your heart should be in work.", cid,
+                            request[1], bank.getBalance());
                 }
             } catch (NumberFormatException e) {
-                response = "Amount of money must be an integer.";
+                response = String.format("%s %s Amount of money must be an integer.", cid, request[1]);
             }
         } else {
-            response = "Undefined Request.";
+            response = String.format("%s %s Undefined Request", cid, request[1]);
         }
         return response;
     }

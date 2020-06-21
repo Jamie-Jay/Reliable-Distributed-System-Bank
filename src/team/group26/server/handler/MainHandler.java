@@ -36,10 +36,10 @@ public class MainHandler extends Thread
                 outputLine = pi.processInput(inputLine);
                 out.println(outputLine);
                 if(!cid.equals("LFD")) {
-                    System.out.println("Reply from [Client " + cid + "] " + inputLine);
+                    System.out.println("Request from [Client " + cid + "] " + inputLine);
                     System.out.println("Response to [Client " + cid + "] " + outputLine);
                 } else {
-                    System.out.println("[LFD] PING");
+                    // System.out.println("[LFD] PING");
                 }
                 if (outputLine.equals("exit"))
                     break;
