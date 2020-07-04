@@ -30,10 +30,10 @@ public class MainHandler extends Thread
                 System.out.println("[client "+ cid +"] is connected.");
             }
             RequestProcessor pi = new RequestProcessor(cid);
-            outputLine = pi.processInput(null);
+            outputLine = sid + " " + pi.processInput(null);
             out.println(outputLine);
             while((inputLine = in.readLine()) != null) {
-                outputLine = pi.processInput(inputLine);
+                outputLine = sid + " " + pi.processInput(inputLine);
                 out.println(outputLine);
                 if(!cid.equals("LFD")) {
                     System.out.println("Request from [Client " + cid + "] " + inputLine);

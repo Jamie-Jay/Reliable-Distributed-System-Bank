@@ -54,6 +54,6 @@ public class RequestProcessor {
         } else {
             response = String.format("%s %s Undefined Request", cid, request[1]);
         }
-        return response;
+        return request[1] + " " + response;
     }
 }
