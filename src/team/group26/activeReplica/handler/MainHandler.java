@@ -1,6 +1,6 @@
-package team.group26.server.handler;
+package team.group26.activeReplica.handler;
 
-import team.group26.server.utils.RequestProcessor;
+import team.group26.activeReplica.utils.RequestProcessor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,14 +30,12 @@ public class MainHandler extends Thread
                 System.out.println("[client "+ cid +"] is connected.");
             }
             RequestProcessor pi = new RequestProcessor(cid);
-            outputLine = pi.processInput(null);
-            out.println(outputLine);
             while((inputLine = in.readLine()) != null) {
                 outputLine = pi.processInput(inputLine);
-                out.println(outputLine);
+                out.println(sid + " " + outputLine);
                 if(!cid.equals("LFD")) {
                     System.out.println("Request from [Client " + cid + "] " + inputLine);
-                    System.out.println("Response to [Client " + cid + "] " + outputLine);
+                    System.out.println("Response to [Client " + cid + "] " + sid + " " + outputLine);
                 } else {
                     // System.out.println("[LFD] PING");
                 }

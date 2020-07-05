@@ -1,4 +1,4 @@
-package team.group26.server;
+package team.group26.activeReplica;
 
 public class Bank {
 

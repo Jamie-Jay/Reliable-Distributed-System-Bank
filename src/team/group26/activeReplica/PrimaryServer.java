@@ -1,8 +1,7 @@
-package team.group26.server;
+package team.group26.activeReplica;
 
-import team.group26.server.handler.MainHandler;
+import team.group26.activeReplica.handler.MainHandler;
 
-import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
