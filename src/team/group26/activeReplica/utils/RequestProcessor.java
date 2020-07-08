@@ -11,11 +11,13 @@ public class RequestProcessor {
 
     private String cid;
     // One thread and one server.ProcessInput object for one client, initial the client ID with client input
-    public RequestProcessor(String cid){
+    public RequestProcessor(String cid, Bank bank){
         this.cid = cid;
-    }
 
-    final Bank bank=Bank.getInstance();
+        this.bank = bank;
+    }
+    Bank bank;
+    //final Bank bank=Bank.getInstance();
 
     public synchronized String processInput(String theInput) {
         if(theInput == null){
@@ -27,6 +29,7 @@ public class RequestProcessor {
             response = "PONG";
             return response;
         }
+
         // Wrong Format
         if(request.length != 5) {
             response = String.format("%s Undefined Request", cid);
@@ -54,6 +57,23 @@ public class RequestProcessor {
         } else {
             response = String.format("%s %s Undefined Request", cid, request[2]);
         }
+        return response;
+    }
+
+    public synchronized String SyncInput(String theInput) {
+        String response = null;
+        if(theInput == null){
+            return response;
+        }
+        String[] request = theInput.split("\\s+");
+        if(request[0].equals(PING)) {
+            response = "PONG";
+            return response;
+        }
+
+        bank.setBalance(Integer.valueOf(request[0]));
+        System.out.println("Update balance of the passive server to " + bank.getBalance());
+
         return response;
     }
 }

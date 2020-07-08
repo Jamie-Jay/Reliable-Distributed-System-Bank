@@ -24,6 +24,10 @@ public class Bank {
         balance+=money;
     }
 
+    public void setBalance(int balance) {
+        this.balance = balance;
+    }
+
     public synchronized boolean withdrawMoney(String cID, int money)
     {
         if(balance-money<0)
