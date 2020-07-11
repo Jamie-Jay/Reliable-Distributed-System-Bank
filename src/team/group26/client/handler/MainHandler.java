@@ -31,32 +31,47 @@ public class MainHandler extends Thread {
             String userInput;
             PrintWriter out1 = new PrintWriter(socket1.getOutputStream(),true);
             BufferedReader in1 = new BufferedReader(new InputStreamReader(socket1.getInputStream()));
-            PrintWriter out2 = new PrintWriter(socket2.getOutputStream(),true);
-            BufferedReader in2 = new BufferedReader(new InputStreamReader(socket2.getInputStream()));
-            PrintWriter out3 = new PrintWriter(socket3.getOutputStream(),true);
-            BufferedReader in3 = new BufferedReader(new InputStreamReader(socket3.getInputStream()));
+            PrintWriter out2 = null;
+            BufferedReader in2 = null;
+            PrintWriter out3 = null;
+            BufferedReader in3 = null;
+            if (socket2 != null) {
+                out2 = new PrintWriter(socket2.getOutputStream(), true);
+                in2 = new BufferedReader(new InputStreamReader(socket2.getInputStream()));
+            }
+            if (socket3 != null) {
+                out3 = new PrintWriter(socket3.getOutputStream(),true);
+                in3 = new BufferedReader(new InputStreamReader(socket3.getInputStream()));
+            }
+
             BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
             System.out.println("Hello, please apply the request <cmd> <amount>");
 
             // Send initialization client id to servers
             out1.println(cid);
-            out2.println(cid);
-            out3.println(cid);
+            if (out2 != null)
+                out2.println(cid);
+            if (out3 != null)
+                out3.println(cid);
 
             while ((userInput = stdIn.readLine()) != null) {
                 System.out.println("client: " + userInput);
                 duplicateManager.put(baseRid, true);
                 (new RequestHandler(out1, in1, duplicateManager,
                         String.format("s1 %s %d %s", cid, baseRid, userInput))).start();
-                (new RequestHandler(out2, in2, duplicateManager,
+                if (out2 != null && in2 != null)
+                    (new RequestHandler(out2, in2, duplicateManager,
                         String.format("s2 %s %d %s", cid, baseRid, userInput))).start();
-                (new RequestHandler(out3, in3, duplicateManager,
+                if (out3 != null && in3 != null)
+                    (new RequestHandler(out3, in3, duplicateManager,
                         String.format("s3 %s %d %s", cid, baseRid, userInput))).start();
                 baseRid += 1;
             }
             socket1.close();
-            socket2.close();
-            socket3.close();
+            if (socket2 != null)
+                socket2.close();
+            if (socket3 != null)
+                socket3.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

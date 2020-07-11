@@ -2,6 +2,7 @@ package team.group26.client;
 
 import team.group26.client.handler.MainHandler;
 
+import java.net.ConnectException;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -12,6 +13,15 @@ public class Client {
     private int baseRid;
     private String cid;
     private List<Socket> servers = new CopyOnWriteArrayList<>();
+
+    public Client(String hostName, int port1, String cid, int baseRid) {
+        this.hostName = hostName;
+        this.port1 = port1;
+        this.port2 = 0;
+        this.port3 = 0;
+        this.cid = cid;
+        this.baseRid = baseRid;
+    }
 
     public Client(String hostName, int port1, int port2, int port3, String cid, int baseRid) {
         this.hostName = hostName;
@@ -25,8 +35,14 @@ public class Client {
     public void runService() {
         try {
             Socket clientSocket1 = new Socket(hostName, port1);
-            Socket clientSocket2 = new Socket(hostName, port2);
-            Socket clientSocket3 = new Socket(hostName, port3);
+            Socket clientSocket2 = null;
+            Socket clientSocket3 = null;
+            try {
+                clientSocket2 = new Socket(hostName, port2);
+                clientSocket3 = new Socket(hostName, port3);
+            } catch (ConnectException e) {
+
+            }
             System.out.println("The client "+cid+" is running");
             (new MainHandler(clientSocket1, clientSocket2, clientSocket3,
                     cid, baseRid)).start();
@@ -38,12 +54,20 @@ public class Client {
     public static void main(String[] args) {
         String hostName = args[0];
         int port1 = Integer.parseInt(args[1]);
-        int port2 = Integer.parseInt(args[2]);
-        int port3 = Integer.parseInt(args[3]);
-        //get the client ID from Command line
-        String cid = args[4];
-        int base_rid = Integer.parseInt(args[5]);
-        (new Client(hostName, port1, port2, port3, cid, base_rid)).runService();
+        if (args.length > 5) {
+            int port2 = Integer.parseInt(args[2]);
+            int port3 = Integer.parseInt(args[3]);
+            //get the client ID from Command line
+            String cid = args[4];
+            int base_rid = Integer.parseInt(args[5]);
+            (new Client(hostName, port1, port2, port3, cid, base_rid)).runService();
+        } else if (args.length > 3)
+        {
+            //get the client ID from Command line
+            String cid = args[2];
+            int base_rid = Integer.parseInt(args[3]);
+            (new Client(hostName, port1, cid, base_rid)).runService();
+        }
     }
 }
 
