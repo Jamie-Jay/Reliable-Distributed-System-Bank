@@ -1,6 +1,7 @@
 package team.group26.activeReplica.utils;
 
 import team.group26.activeReplica.Bank;
+import team.group26.activeReplica.handler.MainHandler;
 
 public class RequestProcessor {
     // Request Type
@@ -15,7 +16,7 @@ public class RequestProcessor {
         this.cid = cid;
     }
 
-    final Bank bank=Bank.getInstance();
+    public static final Bank bank=Bank.getInstance();
 
     public synchronized String processInput(String theInput) {
         if(theInput == null){
@@ -29,7 +30,7 @@ public class RequestProcessor {
         }
         // Wrong Format
         if(request.length != 5) {
-            response = String.format("%s Undefined Request", cid);
+            response = String.format("%s %s Undefined Request", cid);
             return response;
         }
 
@@ -54,6 +55,9 @@ public class RequestProcessor {
         } else {
             response = String.format("%s %s Undefined Request", cid, request[2]);
         }
+
+        // Update least recent rid in MainHandler
+        MainHandler.rid = Integer.parseInt(request[2]);
         return response;
     }
 }

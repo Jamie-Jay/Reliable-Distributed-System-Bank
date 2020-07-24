@@ -41,4 +41,9 @@ public class Bank {
         return balance;
     }
 
+    public synchronized void setBalance(int money)
+    {
+        this.balance = money;
+    }
+
 }

@@ -1,5 +1,6 @@
 package team.group26.client;
 
+import sun.applet.Main;
 import team.group26.client.handler.MainHandler;
 
 import java.net.Socket;
@@ -24,12 +25,11 @@ public class Client {
 
     public void runService() {
         try {
-            Socket clientSocket1 = new Socket(hostName, port1);
-            Socket clientSocket2 = new Socket(hostName, port2);
-            Socket clientSocket3 = new Socket(hostName, port3);
+            MainHandler.socket[0] = new Socket(hostName, port1);
+            MainHandler.socket[1] = new Socket(hostName, port2);
+            MainHandler.socket[2] = new Socket(hostName, port3);
             System.out.println("The client "+cid+" is running");
-            (new MainHandler(clientSocket1, clientSocket2, clientSocket3,
-                    cid, baseRid)).start();
+            (new MainHandler(cid, baseRid)).start();
         } catch (Exception e) {
             e.printStackTrace();
         }
