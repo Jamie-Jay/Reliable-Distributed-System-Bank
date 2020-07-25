@@ -5,14 +5,21 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.List;
 
 public class RMHandler extends Thread {
-    Socket clientSocket;
+    private Socket clientSocket;
+    private PrintWriter outClient;
+    private BufferedReader inClient;
 
-    public RMHandler(Socket clientSocket) {
+    public RMHandler(Socket clientSocket) throws IOException {
         this.clientSocket = clientSocket;
+        this.outClient = new PrintWriter(clientSocket.getOutputStream(),true);
+        this.inClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     }
 
+    // hard code sid and port
     public int getServerPort(String sid) {
         if (sid.equals("s1")) {
             return 8080;
@@ -23,6 +30,21 @@ public class RMHandler extends Thread {
         }
         return -1;
     }
+
+    /*public synchronized void messageProxy(String payload) {
+        for (String member : ReplicaManager.membership) {
+            String message = String.format("%s %s", member, payload);
+            int serverPort = getServerPort(member);
+            try {
+                Socket socket = new Socket("localhost", serverPort);
+                (new RequestHandler(socket, message)).start();
+            } catch (IOException e) {
+                // do nothing is member differs
+            }
+        }
+    }*/
+
+
 
     /* RM_MSG format: NEW_MEMBER <sid> <port>*/
     public void sendCheckpointMsg(String s1, String s2) throws IOException {
@@ -72,11 +94,23 @@ public class RMHandler extends Thread {
         return true;
     }
 
+    public boolean handleMemberRequest (String[] request) {
+        if (!request[0].equals("MEM_REQ")) {
+            return false;
+        }
+        String msg = "";
+        for (String member : ReplicaManager.membership) {
+            msg += (member + " ");
+        }
+        outClient.println(msg);
+        return true;
+    }
+
     @Override
     public void run() {
         try {
             // PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            BufferedReader in = this.inClient;
             String inputLine;
             while((inputLine = in.readLine()) != null) {
                 String[] request = inputLine.split("\\s+");
@@ -84,6 +118,9 @@ public class RMHandler extends Thread {
                     continue;
                 }
                 if (handleMembership(request)) {
+                    continue;
+                }
+                if (handleMemberRequest(request)) {
                     continue;
                 }
             }

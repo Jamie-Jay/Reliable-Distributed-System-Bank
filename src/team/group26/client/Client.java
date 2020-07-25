@@ -1,18 +1,20 @@
 package team.group26.client;
 
-import sun.applet.Main;
-import team.group26.client.handler.MainHandler;
+import team.group26.client.handler.RequestHandler;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Client {
     private String hostName;
     private int port1, port2, port3;
     private int baseRid;
     private String cid;
-    private List<Socket> servers = new CopyOnWriteArrayList<>();
+    private Map<Integer, Boolean> duplicateManager = new ConcurrentHashMap<>();
 
     public Client(String hostName, int port1, int port2, int port3, String cid, int baseRid) {
         this.hostName = hostName;
@@ -23,15 +25,47 @@ public class Client {
         this.baseRid = baseRid;
     }
 
+    // hard code sid and port
+    public int getServerPort(String sid) {
+        if (sid.equals("s1")) {
+            return 8080;
+        } else if (sid.equals("s2")) {
+            return 8081;
+        } else if (sid.equals("s3")) {
+            return 8082;
+        }
+        return -1;
+    }
+
     public void runService() {
         try {
-            MainHandler.socket[0] = new Socket(hostName, port1);
-            MainHandler.socket[1] = new Socket(hostName, port2);
-            MainHandler.socket[2] = new Socket(hostName, port3);
             System.out.println("The client "+cid+" is running");
-            (new MainHandler(cid, baseRid)).start();
+            BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+
+            // hard code address of RM
+            Socket socketRM = new Socket("localhost", 4040);
+
+            // IO Stream of RM
+            PrintWriter outRM = new PrintWriter(socketRM.getOutputStream(),true);
+            BufferedReader inRM = new BufferedReader(new InputStreamReader(socketRM.getInputStream()));
+            System.out.println("Hello, Welcome! Please use the command <cmd> <amount>");
+            String userInput;
+            while ((userInput = stdIn.readLine()) != null) {
+                // Get membership list
+                outRM.println("MEM_REQ");
+                String[] membersList = (inRM.readLine()).split("\\s+");
+
+                duplicateManager.put(baseRid, true);
+                // System.out.println(membersList);
+                for (String member : membersList) {
+                    String request = String.format("%s %s %d %s", member, cid, baseRid, userInput);
+                    Socket clientSocket = new Socket("localhost", getServerPort(member));
+                    (new RequestHandler(clientSocket, duplicateManager, request)).start();
+                }
+                baseRid += 1;
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
