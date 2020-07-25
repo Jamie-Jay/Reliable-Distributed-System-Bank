@@ -34,9 +34,9 @@ public class MainHandler extends Thread {
             System.out.println("Hello, please apply the request <cmd> <amount>");
 
             // Send initialization client id to servers
-            out1.println(cid);
-            out2.println(cid);
-            out3.println(cid);
+            //out1.println(cid);
+            //out2.println(cid);
+            //out3.println(cid);
 
 
             while ((userInput = stdIn.readLine()) != null) {

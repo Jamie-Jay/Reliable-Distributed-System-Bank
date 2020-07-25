@@ -28,6 +28,15 @@ public class GFDHandler extends Thread{
         System.out.println(res);
     }
 
+    public void updateRM(String msg) throws IOException {
+        // hard-code the address of RM
+        Socket socket = new Socket("localhost", 4040);
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        out.println(msg);
+        out.close();
+        socket.close();
+    }
+
     @Override
     public void run() {
         try{
@@ -44,7 +53,7 @@ public class GFDHandler extends Thread{
                 op = requests[1];
                 sid = requests[2];
                 // delete a server from membership
-                if(("delete").equals(op)) {
+                if(("DELETE").equals(op)) {
                     for(String item : membership) {
                         if (item.equals(sid)) {
                             membership.remove(item);
@@ -52,11 +61,13 @@ public class GFDHandler extends Thread{
                         }
                     }
                 }
-                if(("add").equals(op)) {
+                if(("ADD").equals(op)) {
                     membership.add(sid);
                 }
+
+                updateRM(String.format("MEMBER %s %s", op, sid));
+
                 printMembership();
-                // System.out.println("GFD: " + inputLine);
             }
         }
         catch(IOException e){

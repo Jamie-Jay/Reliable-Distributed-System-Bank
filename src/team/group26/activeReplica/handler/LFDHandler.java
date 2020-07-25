@@ -30,13 +30,14 @@ public class LFDHandler extends TimerTask {
         try {
             out.println("PING");
             heartbeatCount += 1;
-            // System.out.println(in.readLine());
-            fromServer = (in.readLine()).split("\\s+");
+            String input = in.readLine();
+            fromServer = input.split("\\s+");
+            //System.out.println(input);
             if((fromServer[1]).equals("PONG")){
                 // add membership message to server
                 if (heartbeatCount == 1) {
                     System.out.println(String.format("%s: %s add %s", lid, lid, sid));
-                    gfdOut.println(String.format("%s add %s", lid, sid));
+                    gfdOut.println(String.format("%s ADD %s", lid, sid));
                 }
                 System.out.println("[Server "+ sid +"] is alive.");
                 if(heartbeatCount % 5 == 0) {
@@ -48,7 +49,7 @@ public class LFDHandler extends TimerTask {
             System.out.println("heartbeat " + heartbeatCount + " times.");
             // delete membership message to server
             System.out.println(String.format("%s: %s delete %s", lid, lid, sid));
-            gfdOut.println(String.format("%s delete %s", lid, sid));
+            gfdOut.println(String.format("%s DELETE %s", lid, sid));
             heartbeatCount = 0;
             isRun = -1;
             this.cancel();

@@ -74,7 +74,7 @@ public class RequestHandler extends Thread{
             }
             try {
                 this.out = new PrintWriter(MainHandler.socket[socketId].getOutputStream(),true);
-                out.println(cid);
+                // out.println(cid);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

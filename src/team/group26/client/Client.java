@@ -46,4 +46,3 @@ public class Client {
         (new Client(hostName, port1, port2, port3, cid, base_rid)).runService();
     }
 }
-

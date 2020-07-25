@@ -39,6 +39,10 @@ public class PrimaryServer {
 
     public static void main(String[] args) {
         int port = Integer.parseInt(args[0]);
+        int isReady = Integer.parseInt(args[2]);
+        if (isReady == 0) {
+            MainHandler.isReady = false;
+        }
         (new PrimaryServer(port, args[1])).runService();
     }
 }

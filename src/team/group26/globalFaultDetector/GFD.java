@@ -1,8 +1,5 @@
 package team.group26.globalFaultDetector;
 
-
-
-import team.group26.activeReplica.PrimaryServer;
 import team.group26.globalFaultDetector.handler.GFDHandler;
 
 import java.net.ServerSocket;

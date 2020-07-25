@@ -10,11 +10,6 @@ public class RequestProcessor {
     private static final String PING = "PING";
     private static final String WELCOME = "Hello, please apply the request <cmd> <amount>";
 
-    private String cid;
-    // One thread and one server.ProcessInput object for one client, initial the client ID with client input
-    public RequestProcessor(String cid){
-        this.cid = cid;
-    }
 
     public static final Bank bank=Bank.getInstance();
 
@@ -30,9 +25,11 @@ public class RequestProcessor {
         }
         // Wrong Format
         if(request.length != 5) {
-            response = String.format("%s %s Undefined Request", cid);
+           response = "-1 -1 Undefined Request.";
             return response;
         }
+
+        String cid = request[1];
 
         if(request[3].equals(DEPOSIT)) {
             try {

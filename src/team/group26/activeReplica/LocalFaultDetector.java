@@ -62,7 +62,7 @@ public class LocalFaultDetector {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             PrintWriter gfdOut = new PrintWriter(gfdSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out.println("LFD");
+            // out.println("LFD");
             Timer timer = new Timer();
             // Reset synchronize argument
             LFDHandler.isRun = 1;
