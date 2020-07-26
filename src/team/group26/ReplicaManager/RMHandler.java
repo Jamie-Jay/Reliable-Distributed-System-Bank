@@ -88,13 +88,16 @@ public class RMHandler extends Thread {
             ReplicaManager.membership.add(sid);
             if (firstSid != null) {
                 sendCheckpointMsg(firstSid, sid);
+            } else {
+                sendCheckpointMsg(sid, sid);
             }
         }
         printMembership();
         return true;
     }
 
-    public boolean handleMemberRequest (String[] request) {
+    // Atomically send membership message
+    public synchronized boolean handleMemberRequest (String[] request) throws IOException {
         if (!request[0].equals("MEM_REQ")) {
             return false;
         }
@@ -103,6 +106,10 @@ public class RMHandler extends Thread {
             msg += (member + " ");
         }
         outClient.println(msg);
+        // If performance matters, delete this line
+        inClient.readLine();
+
+        // Thread.sleep(500);
         return true;
     }
 

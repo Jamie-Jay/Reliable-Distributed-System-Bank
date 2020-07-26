@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MainHandler extends Thread
 {
@@ -79,7 +80,7 @@ public class MainHandler extends Thread
                 String cid = (inputLine.split("\\s+"))[1];
                 outputLine = pi.processInput(inputLine);
                 out.println(sid + " " + outputLine);
-                System.out.println("(recovery from log) Request from [Client " + cid + "]" + inputLine);
+                System.out.println("(recovery from log) Request from [Client " + cid + "] " + inputLine);
                 System.out.println("(recovery from log) Response to [Client " + cid + "] " + sid + " " + outputLine);
             }
             if ((inputLine.split("\\s+")[2]).equals(lastRid)) {
@@ -124,7 +125,8 @@ public class MainHandler extends Thread
                     continue;
                 }
 
-                String cid = (inputLine.split("\\s+"))[1];
+                String[] requests = inputLine.split("\\s+");
+                String cid = requests[1];
 
 
                 outputLine = pi.processInput(inputLine);

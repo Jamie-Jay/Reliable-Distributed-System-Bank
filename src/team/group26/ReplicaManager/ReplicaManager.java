@@ -5,26 +5,19 @@ import java.net.Socket;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReplicaManager {
     public static BlockingDeque<String> msgQueue = new LinkedBlockingDeque<>();
     public static CopyOnWriteArrayList<String> membership = new CopyOnWriteArrayList<>();
+    // public static AtomicInteger globalSyncId = new AtomicInteger(0);
     private int port;
 
     public ReplicaManager(int port) {
         this.port = port;
     }
 
-    public int getServerPort(String sid) {
-        if (sid.equals("s1")) {
-            return 8080;
-        } else if (sid.equals("s2")) {
-            return 8081;
-        } else if (sid.equals("s3")) {
-            return 8082;
-        }
-        return -1;
-    }
+
 
     public void runService() {
         try {

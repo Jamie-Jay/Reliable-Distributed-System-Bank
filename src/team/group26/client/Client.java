@@ -15,14 +15,26 @@ public class Client {
     private int baseRid;
     private String cid;
     private Map<Integer, Boolean> duplicateManager = new ConcurrentHashMap<>();
+    private int mode;
+    public static String[] autoRequests = {
+            "DEP 100",
+            "DEP 200",
+            "DEP 100",
+            "WTD 100",
+            "WTD 200",
+            "DEP 500",
+            "DEP 400",
+            "WTD 300"
+    };
 
-    public Client(String hostName, int port1, int port2, int port3, String cid, int baseRid) {
+    public Client(String hostName, int port1, int port2, int port3, String cid, int baseRid, int mode) {
         this.hostName = hostName;
         this.port1 = port1;
         this.port2 = port2;
         this.port3 = port3;
         this.cid = cid;
         this.baseRid = baseRid;
+        this.mode = mode;
     }
 
     // hard code sid and port
@@ -37,7 +49,44 @@ public class Client {
         return -1;
     }
 
-    public void runService() {
+    public void runAutoService() {
+        try {
+            System.out.println("The client (auto)"+ cid +" is running");
+
+            // hard code address of RM
+            Socket socketRM = new Socket("localhost", 4040);
+
+            // IO Stream of RM
+            PrintWriter outRM = new PrintWriter(socketRM.getOutputStream(),true);
+            BufferedReader inRM = new BufferedReader(new InputStreamReader(socketRM.getInputStream()));
+            System.out.println("Hello, Welcome! Please use the command <cmd> <amount>");
+            while (true) {
+                for (String userInput : autoRequests) {
+                    System.out.println("********************************************************************************");
+                    // Get membership list
+                    outRM.println("MEM_REQ");
+                    String[] membersList = (inRM.readLine()).split("\\s+");
+
+                    duplicateManager.put(baseRid, true);
+                    // System.out.println(membersList);
+                    for (int i = 0; i < membersList.length; i++) {
+                        String request = String.format("%s %s %d %s", membersList[i], cid, baseRid, userInput);
+                        Socket clientSocket = new Socket("localhost", getServerPort(membersList[i]));
+                        (new RequestHandler(clientSocket, duplicateManager, request)).start();
+                    }
+                    // Make user operation atomic
+                    Thread.sleep(300);
+                    outRM.println("Finished!");
+                    baseRid += 1;
+                    Thread.sleep(5000);
+                }
+            }
+        } catch (Exception e) {
+            //e.printStackTrace();
+        }
+    }
+
+    public void runManualService() {
         try {
             System.out.println("The client "+cid+" is running");
             BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
@@ -57,15 +106,26 @@ public class Client {
 
                 duplicateManager.put(baseRid, true);
                 // System.out.println(membersList);
-                for (String member : membersList) {
-                    String request = String.format("%s %s %d %s", member, cid, baseRid, userInput);
-                    Socket clientSocket = new Socket("localhost", getServerPort(member));
+                for (int i = 0; i < membersList.length; i++) {
+                    String request = String.format("%s %s %d %s", membersList[i], cid, baseRid, userInput);
+                    Socket clientSocket = new Socket("localhost", getServerPort(membersList[i]));
                     (new RequestHandler(clientSocket, duplicateManager, request)).start();
                 }
+                // Make user operation atomic
+                Thread.sleep(300);
+                outRM.println("Finished!");
                 baseRid += 1;
             }
         } catch (Exception e) {
             //e.printStackTrace();
+        }
+    }
+
+    public void runService() {
+        if (this.mode == 0) {
+            runManualService();
+        } else {
+            runAutoService();
         }
     }
 
@@ -77,6 +137,8 @@ public class Client {
         //get the client ID from Command line
         String cid = args[4];
         int base_rid = Integer.parseInt(args[5]);
-        (new Client(hostName, port1, port2, port3, cid, base_rid)).runService();
+        int mode = Integer.parseInt(args[6]);
+
+        (new Client(hostName, port1, port2, port3, cid, base_rid, mode)).runService();
     }
 }
