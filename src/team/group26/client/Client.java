@@ -71,7 +71,12 @@ public class Client {
                     // System.out.println(membersList);
                     for (int i = 0; i < membersList.length; i++) {
                         String request = String.format("%s %s %d %s", membersList[i], cid, baseRid, userInput);
-                        Socket clientSocket = new Socket("localhost", getServerPort(membersList[i]));
+                        Socket clientSocket;
+                        try {
+                            clientSocket = new Socket("localhost", getServerPort(membersList[i]));
+                        } catch (Exception e) {
+                            continue;
+                        }
                         (new RequestHandler(clientSocket, duplicateManager, request)).start();
                     }
                     // Make user operation atomic
@@ -82,7 +87,7 @@ public class Client {
                 }
             }
         } catch (Exception e) {
-            //e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
